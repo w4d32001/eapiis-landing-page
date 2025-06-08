@@ -187,11 +187,9 @@ const isLinkActive = (href: any) => {
             });
         }
 
-        // Escuchar cambios en el hash y en la ruta
         window.addEventListener("hashchange", updateActiveItem);
         window.addEventListener("popstate", updateActiveItem);
 
-        // Actualizar al cargar
         updateActiveItem();
     }
 
