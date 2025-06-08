@@ -1,0 +1,81 @@
+---
+import Logo from "./Logo.astro";
+import { NAV_DATA } from "@/const/navconst";
+import NavLink from "./NavLink.astro";
+import Menu from "../assets/icons/menu.svg";
+import Close from "../assets/icons/close.svg";
+
+const currentPath = Astro.url.pathname;
+---
+
+<div class="lg:hidden p-4 flex items-center justify-between">
+    <button id="menu-toggle" class="focus:outline-none">
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="size-9 text-white"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3.75 5.25h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5"
+            ></path>
+        </svg>
+    </button>
+</div>
+
+<div
+    id="mobile-menu"
+    class="fixed top-0 right-0 h-full w-2/3 bg-white shadow-lg p-4 z-50 transform translate-x-full transition-transform duration-300 ease-in-out"
+>
+    <button id="menu-close" class="mb-4">
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="size-8 text-red-600 hover:text-red-900"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18 18 6M6 6l12 12"></path>
+        </svg>
+    </button>
+
+    <nav class="flex flex-col gap-2 mt-4">
+        {
+            NAV_DATA.map((item) => {
+                const isActive = currentPath.includes(item.href);
+                return (
+                    <NavLink
+                        href={item.href}
+                        text={item.label}
+                        isActive={isActive}
+                        data-id={item.href}
+                    />
+                );
+            })
+        }
+    </nav>
+</div>
+
+<script is:inline>
+    const toggle = document.getElementById("menu-toggle");
+    const menu = document.getElementById("mobile-menu");
+    const closeBtn = document.getElementById("menu-close");
+
+    toggle?.addEventListener("click", () => {
+        menu?.classList.remove("translate-x-full");
+        menu?.classList.add("translate-x-0");
+    });
+
+    closeBtn?.addEventListener("click", () => {
+        menu?.classList.remove("translate-x-0");
+        menu?.classList.add("translate-x-full");
+    });
+</script>

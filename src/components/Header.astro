@@ -1,0 +1,202 @@
+---
+import Logo from "./Logo.astro";
+import NavLink from "./NavLink.astro";
+import MobileMenu from "./MobileMenu.astro";
+import { NAV_DATA } from "../const/navconst.js";
+
+const currentUrl = Astro.url;
+const currentHash = currentUrl.hash || "";
+const currentPath = currentUrl.pathname;
+
+// Función mejorada para detectar enlaces activos
+const isLinkActive = (href: any) => {
+    if (href.startsWith("#")) {
+        return currentHash === href;
+    }
+    return (
+        currentPath === href || (href !== "/" && currentPath.startsWith(href))
+    );
+};
+---
+
+<header class="relative pt-4 px-4 flex flex-col gap-4">
+    <div class="flex items-center justify-between w-full lg:w-auto">
+        <Logo />
+        <div class="block lg:hidden">
+            <MobileMenu />
+        </div>
+        <div class="hidden lg:block bg-red-500">recuross</div>
+    </div>
+
+    <nav id="landing-header" class="hidden lg:block w-full relative">
+        <div class="absolute inset-0 bg-white rounded-t z-10"></div>
+
+        <div
+            id="menu-backdrop"
+            class="absolute bg-primary rounded transition-all duration-300 ease-in-out z-20"
+            style="
+                left: var(--left);
+                top: var(--top);
+                width: var(--width);
+                height: var(--height);
+                opacity: var(--opacity, 0);
+            "
+        >
+        </div>
+
+        <ul
+            class="relative flex items-center justify-between gap-4 h-15 w-full px-2 z-30"
+        >
+            {
+                NAV_DATA.map((item) => {
+                    const isActive = isLinkActive(item.href);
+                    return (
+                        <NavLink
+                            href={item.href}
+                            text={item.label}
+                            isActive={isActive}
+                            data-id={item.href}
+                        />
+                    );
+                })
+            }
+        </ul>
+    </nav>
+</header>
+
+<script is:inline>
+    function setupDesktopNav() {
+        const header = document.querySelector("header");
+        const nav = document.querySelector("#landing-header");
+        const logo = document.querySelector("header a.hidden.lg\\:block");
+        const menuBackDrop = document.querySelector("#menu-backdrop");
+        const listItems = document.querySelectorAll("#landing-header li");
+        const navList = document.querySelector("#landing-header ul");
+        let activeItem = document.querySelector(
+            '#landing-header li[data-active="true"]'
+        );
+        let currentHoverItem = null;
+        let returnTimeout;
+
+        if (!nav || !menuBackDrop) return;
+
+        if (window.innerWidth < 1024) {
+            menuBackDrop.style.display = "none";
+            return;
+        } else {
+            menuBackDrop.style.display = "block";
+        }
+
+        function positionBackdrop(element) {
+            if (!element) return;
+
+            const { left, top, width, height } =
+                element.getBoundingClientRect();
+            const navRect = nav.getBoundingClientRect();
+
+            menuBackDrop.style.setProperty(
+                "--left",
+                `${left - navRect.left}px`
+            );
+            menuBackDrop.style.setProperty("--top", `${top - navRect.top}px`);
+            menuBackDrop.style.setProperty("--width", `${width}px`);
+            menuBackDrop.style.setProperty("--height", `${height}px`);
+            menuBackDrop.style.setProperty("--opacity", "1");
+        }
+
+        function handleScroll() {
+            const scrollPosition = window.scrollY;
+
+            if (scrollPosition > 100) {
+                if (logo) logo.style.display = "none";
+
+                nav.style.position = "fixed";
+                nav.style.top = "0";
+                nav.style.left = "0";
+                nav.style.right = "0";
+                nav.style.zIndex = "50";
+                nav.style.backgroundColor = "white";
+                nav.style.paddingTop = "1rem";
+                nav.style.paddingBottom = "1rem";
+                nav.style.width = "100%";
+            } else {
+                if (logo) logo.style.display = "block";
+
+                nav.style.position = "";
+                nav.style.top = "";
+                nav.style.left = "";
+                nav.style.right = "";
+                nav.style.zIndex = "";
+                nav.style.backgroundColor = "";
+                nav.style.paddingTop = "";
+                nav.style.paddingBottom = "";
+                nav.style.width = "";
+            }
+
+            if (activeItem) positionBackdrop(activeItem);
+        }
+
+        handleScroll();
+        window.addEventListener("scroll", handleScroll);
+
+        if (activeItem) {
+            positionBackdrop(activeItem);
+        }
+
+        listItems.forEach((item) => {
+            item.addEventListener("mouseenter", () => {
+                clearTimeout(returnTimeout);
+                currentHoverItem = item;
+                positionBackdrop(item);
+            });
+
+            item.addEventListener("mouseleave", () => {
+                currentHoverItem = null;
+                returnTimeout = setTimeout(() => {
+                    if (!currentHoverItem && activeItem) {
+                        positionBackdrop(activeItem);
+                    }
+                }, 100);
+            });
+        });
+
+        navList.addEventListener("mouseleave", () => {
+            currentHoverItem = null;
+            setTimeout(() => {
+                if (activeItem) {
+                    positionBackdrop(activeItem);
+                }
+            }, 100);
+        });
+        function updateActiveItem() {
+            const currentHash = window.location.hash;
+            const currentPath = window.location.pathname;
+
+            listItems.forEach((item) => {
+                const href = item.getAttribute("data-id");
+                const isActive = href.startsWith("#")
+                    ? currentHash === href
+                    : currentPath === href ||
+                      (href !== "/" && currentPath.startsWith(href));
+
+                item.setAttribute("data-active", isActive);
+                if (isActive) {
+                    activeItem = item;
+                    positionBackdrop(activeItem);
+                }
+            });
+        }
+
+        // Escuchar cambios en el hash y en la ruta
+        window.addEventListener("hashchange", updateActiveItem);
+        window.addEventListener("popstate", updateActiveItem);
+
+        // Actualizar al cargar
+        updateActiveItem();
+    }
+
+    setupDesktopNav();
+    window.addEventListener("resize", () => {
+        setupDesktopNav();
+    });
+</script>
