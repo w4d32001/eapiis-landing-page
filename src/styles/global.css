@@ -5,8 +5,28 @@
 @theme {
   --font-roboto: "Roboto", sans-serif; 
   --color-primary: #051F58; 
+  --color-secondary: #07183D;
+  --color-tertiary: #B2A346;
+  --color-accent: #367E93;
 }
 
 html {
   scroll-behavior: smooth;
+}
+::view-transition-old(root) {
+  animation: fade-out 0.3s ease-in-out forwards;
+}
+
+::view-transition-new(root) {
+  animation: fade-in 0.3s ease-in-out forwards;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-out {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-20px); }
 }
