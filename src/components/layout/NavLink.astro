@@ -4,14 +4,14 @@ console.log("NavLink", { href, text, isActive });
 ---
 
 <li
-    class={`relative flex items-center text-sm font-medium uppercase rounded py-2 px-4 hover:font-bold lg:hover:text-white z-40
+    class={`relative w-full flex items-center justify-center rounded hover:font-bold lg:hover:text-white z-40
         ${isActive ? "text-white bg-primary font-bold" : "text-primary"} transition-all duration-300 ease-in-out`}
     data-active={isActive}
     data-id={href}
 >
     <a
         href={href}
-        class="relative block"
+        class="flex items-center text-[14px] justify-center h-full w-full py-2 px-4 font-bold text-center"
         onclick={href.startsWith("#")
             ? `event.preventDefault(); document.querySelector('${href}').scrollIntoView({ behavior: 'smooth' }); window.history.pushState(null, null, '${href}');`
             : null}

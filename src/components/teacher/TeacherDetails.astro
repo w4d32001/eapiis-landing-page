@@ -1,0 +1,41 @@
+---
+import Separator from "@/components/ui/Separator.astro";
+import { Icon } from "astro-icon/components";
+
+export interface Props {
+  teacher: {
+    name: string;
+    position: string;
+    image: string;
+    school: string;
+    email: string;
+    phone: string;
+  };
+}
+
+const { teacher } = Astro.props;
+---
+
+<article
+  class="pr-8 grid grid-cols-3 w-full items-center gap-4 rounded-lg border shadow-primary shadow-lg border-gray-300"
+>
+  <div class="col-span-1">
+    <img
+      src={teacher.image}
+      alt=""
+      class="w-70 h-70 rounded-l object-cover shadow-lg"
+    />
+  </div>
+  <div class="flex flex-col gap-2 col-span-2">
+    <span class="text-primary text-4xl font-semibold">{teacher.school}</span>
+    <Separator />
+    <h3 class="font-bold text-black/90 text-xl">{teacher.name}</h3>
+    <p class="text-black/60">{teacher.position}</p>
+    <span class="text-black/60 flex items-center gap-x-2"
+      ><Icon name="envelope" />{teacher.email}</span
+    >
+    <span class="text-black/60 flex items-center gap-x-2"
+      ><Icon name="envelope" />{teacher.phone}</span
+    >
+  </div>
+</article>
